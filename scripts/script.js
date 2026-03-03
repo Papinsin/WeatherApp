@@ -20,7 +20,6 @@ form.addEventListener('submit', (event) => {
 
 
 async function checkCity(cityName) {
-    error404Display.classList.remove("display")
 
     try {
         const weatherData = await getWeatherData(cityName)
