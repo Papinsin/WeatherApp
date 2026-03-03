@@ -1,4 +1,4 @@
-import {backgroundUpdate} from "./backgroundUpdate.js"
+import { backgroundUpdate } from "./backgroundUpdate.js"
 
 
 const form = document.querySelector('form')
@@ -13,42 +13,38 @@ form.addEventListener('submit', (event) => {
     console.log(cityName)
     event.preventDefault()
 
-    cityName !== "" ? checkCity(cityName) : error404Function(cityName)
-
+    getWeatherData(cityName)
 
 })
 
 
-async function checkCity(cityName) {
+async function getWeatherData(cityName) {
 
-    try {
-        const weatherData = await getWeatherData(cityName)
-        
-        uploadWeatherInformation(weatherData)
+    const apiUrl = `https://api.weatherapi.com/v1/current.json?key=80ceb5c298164f5180960308260303&q=${cityName}`
 
-    }
-    catch (error) {
-        console.log(error)
+    let cityData = await fetch(apiUrl)
+    console.log(cityData)
+    if(!cityData.ok){
+        console.log(cityData.ok)
         error404Function(cityName)
     }
+    cityData = await cityData.json()
+    const { location } = cityData
+    const { current } = cityData
+    uploadWeatherInformation(location, current)
+    
 
+    
+
+  
 }
 
-async function getWeatherData(cityName) {
-    const apiUrl = `https://api.weatherapi.com/v1/current.json?key=80ceb5c298164f5180960308260303&q=${cityName}`
-    const cityData = await (await fetch(apiUrl)).json()
-    console.log(cityData)
-    const {location}  = cityData
-    const {current} = cityData
-    uploadWeatherInformation(location , current)
-}
-
-function uploadWeatherInformation({name , country}, {last_updated, humidity , condition , temp_c}) {
+function uploadWeatherInformation({ name, country }, { last_updated, humidity, condition, temp_c }) {
     console.log(condition.text)
     console.log(condition)
-     backgroundUpdate(name)
+    backgroundUpdate(name)
 
-    let content =  `
+    let content = `
                 <div class="card_city">
                     <fieldset>
                         <h2 class="city_name">${name}</h2>
@@ -68,18 +64,11 @@ function uploadWeatherInformation({name , country}, {last_updated, humidity , co
     card.style.display = "flex"
 }
 
-function searchEmoji() {
-
-}
-
-function searchCityimage() {
-
-}
-
-
 function error404Function(cityName) {
+    console.log(cityName)
+    let content = `
+                <h1 class="card_city">plsease enter a valid city name<br> ${cityName} is not a city</h1> 
 
-    card.style.display = "flex"
-    error404Display.classList.add("display")
-    error404Display.textContent = `please input a valid city name. ${cityName}`
+    `
+    card.innerHTML = content
 }
